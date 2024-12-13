@@ -1,16 +1,41 @@
 from abc import ABC
 from collections import defaultdict
-from .orderbook import Order
 
 
-class Ticker(ABC):
+class TickerTemplate(ABC):
     """
-    Abstract class with a common ticker template needed to represent Holding objects
+    Abstract class with a common ticker template
     """
     def __init__(self, symbol: str, name: str):
         self.symbol=symbol
         self.name=name
         ...
+
+
+class Ticker(TickerTemplate):
+    """
+    Pattern for storing collection of tickers is a list of tuples:
+    [('AAPL', 'Apple Inc.'), ('TSLA', 'Tesla'), ...]
+    """
+    def __init__(self, symbol, name):
+        super().__init__(symbol, name)
+
+    def check_ticker(self, tickers: list[tuple]) -> list:
+        for s, n in tickers:
+            if not any(s==symbol for symbol, name in tickers):
+                tickers.append((self.symbol, self.name))
+            else:
+                for i, (s, n) in enumerate(tickers):
+                    if self.symbol==s:
+                        tickers[i]=(self.name, self.symbol)
+        return tickers
+
+
+class Holding:
+    def __init__(self, ticker: tuple, quantity: int, price: float):
+        self.ticker = ticker
+        self.quantity = quantity
+        self.price = price
 
 
 class Portfolio:
@@ -26,12 +51,9 @@ class Portfolio:
 
     def _initialize_holdings(self) -> defaultdict:
         """
-        Creates the initial holdings defaultdict based on the loaded tickers.
-
-        Returns:
-            defaultdict: A defaultdict where each key is a ticker symbol and the value
-                         is a dictionary with `name` and `quantity` set to 0.
-                         example: {
+        Creates the initial holdings defaultdict based on the loaded tickers 
+        with `symbol` as a key and`name` and `quantity` as values
+                                 {
                                     'AAPL': {'name': 'Apple', 'quantity': 0},
                                     'GOOGL': {'name': 'Alphabet', 'quantity': 0}
                                 }
@@ -42,17 +64,17 @@ class Portfolio:
             holdings[symbol]['quantity'] = 0
         return holdings
     
-    def update_portfolio(self, successfull_order: Order):
-        holding_symbol = successfull_order.ticker.symbol
-        holding_name = successfull_order.ticker.name
+    def update_portfolio(self, holding: Holding):
+        ticker_symbol = holding.ticker.symbol
+        ticker_name = holding.ticker.name
 
-        if holding_symbol not in self.holdings.keys():
-            self.tickers.append((holding_symbol, holding_name))
+        if ticker_symbol not in self.holdings.keys():
+            self.tickers.append((ticker_symbol, ticker_name))
 
-        self.holdings[holding_symbol]['name']=holding_name
-        self.holdings[holding_symbol]['quantity']+=successfull_order.quantity
+        self.holdings[ticker_symbol]['name']=ticker_name
+        self.holdings[ticker_symbol]['quantity']+=holding.quantity
         
-        print(f"Added new ticker {holding_symbol} with {successfull_order.quantity} to portfolio")
+        print(f"Added ticker {ticker_symbol} with {holding.quantity} to portfolio")
 
     def print_portfolio(self):
         print("Current holdings:")

@@ -1,21 +1,12 @@
 from dataclasses import dataclass
 
-from trading.orderbook import (
-    Order, 
-    OrderBook
-)
+from trading.transaction import Transaction
 
 
 @dataclass
-class OrderController:
-    order: Order
-    order_book: OrderBook
-
-    @property
-    def trading_details(self) -> str:
-        return f" Added {self.order} to order book"
+class OrderBookController:
     
-    def execute(self, order: Order, order_book: OrderBook):
-        order_book.execute(order)
+    def execute(self, transaction: Transaction):
+        transaction.execute()
     
     
