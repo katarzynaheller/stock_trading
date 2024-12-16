@@ -35,7 +35,7 @@ class RemoveOrder:
 
     @property
     def transaction_details(self) -> str:
-        return f"Removed {self.order} to order book"
+        return f"Removed {self.order} from order book"
     
     def execute(self):
         self.order_book.remove(self.order)

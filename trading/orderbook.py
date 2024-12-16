@@ -8,8 +8,10 @@ class Order:
     """
     Represents an buy/sell order with a specified price and quantity
     """
+    _order_counter=0
     def __init__(self, order_type: OrderType, price: float, quantity: int, ticker: Ticker):
-        self.order_id = str(uuid.uuid4()) 
+        Order._order_counter +=1
+        self.order_id = Order._order_counter
         self.ticker = ticker
         self.order_type = order_type
         self.price = price
@@ -24,8 +26,8 @@ class Order:
         if quantity:
             self.quantity=quantity
     
-    def __str__(self):
-        return f"Order(type={self.order_type}, price={self.price}, quantity={self.quantity})"
+    def __repr__(self):
+        return f"Order for {self.ticker} ${self.price * self.quantity})"
     
     
 class OrderBook:
@@ -41,13 +43,6 @@ class OrderBook:
     def add(self, order: Order):
         try:
             self.order_counter += 1
-            order = Order(
-                ticker=order.ticker,
-                order_type=order.order_type, 
-                price=order.price, 
-                quantity=order.quantity
-            )
-
             self.order_book.append(order)
             return self.order_book
         

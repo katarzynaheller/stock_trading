@@ -5,8 +5,6 @@ from utils.enums import OrderType
 from utils.importers import TickerImporter
 
 def main():
-    
-
     importer = TickerImporter('tickers.csv')
     importer.load_tickers()
     tickers = importer.get_ticker_data()
